@@ -9,15 +9,12 @@
 
     <div class="clock">
       <div class="clock-face">
-        <div class="hand hour-hand">
-          <div class="clear-hour"></div>
-          <div class="solid-hour"></div>
+        <div class="hands">
+          <div class="hour-hand"></div>
+          <div class="min-hand"></div>
+          <div class="second-hand"></div>
+          <div class="center-dot"></div>
         </div>
-        <div class="hand min-hand">
-          <div class="clear-min"></div>
-          <div class="solid-min"></div>
-        </div>
-        <div class="hand second-hand"></div>
       </div>
     </div>
 
@@ -59,49 +56,57 @@
       position: relative;
       width: 100%;
       height: 100%;
-      transform: translateY(-3px); /* account for the height of the clock hands */
     }
 
-    .hand {
-      width: 50%;
-      height: 4%;
+    .center-dot {
       position: absolute;
-      transform: rotate(90deg);
-      top: 50%;
-      transform-origin: 100%;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 1rem;
+      left: -1rem;
+      top: -1rem;
+      background: black;
+
+    }
+
+    .hands {
+      width: 50%;
+      height: 50%;
+      position: absolute;
+      transform: rotate(180deg);
+    }
+
+    .hour-hand {
+      width: 10px;
+      left: -5px;  /* the 'left' value needs to be -1/2 of the width value */
+      height: 80px;
+      position: absolute;
+      background: black;
+      transform-origin: 50% 0%;
       transition: all 0.5s;
       transition-timing-function: cubic-bezier(0, 0, 0.2, 1.1);
     }
 
-    .hour-hand {
-      display: inline-flex;
-      transform-origin: 0%;
-    }
-      .clear-hour {
-        order: 1;
-      }
-      .solid-hour {
-        order: 2;
-        width: 50%;
-        background: black;
-      }
-
     .min-hand {
-      display: inline-flex;
-      transform-origin: 0%;
+      width: 10px;
+      left: -5px; /* the 'left' value needs to be -1/2 of the width value */
+      height: 130px;
+      position: absolute;
+      background: black;
+      transform-origin: 50% 0%;
+      transition: all 0.5s;
+      transition-timing-function: cubic-bezier(0, 0, 0.2, 1.1);
     }
-      .clear-min {
-        order: 1;
-      }
-      .solid-min {
-        order: 2;
-        width: 80%;
-        background: black;
-      }
 
     .second-hand {
-      height: 3%;
+      width: 6px;
+      left: -3px;  /* the 'left' value needs to be -1/2 of the width value */
+      height: 150px;
+      position: absolute;
       background: black;
+      transform-origin: 50% 0%;
+      transition: all 0.5s;
+      transition-timing-function: cubic-bezier(0, 0, 0.2, 1.1);
     }
 
   </style>
@@ -113,20 +118,30 @@
       function setDate() {
         const now = new Date();  //current time instance
         const seconds = now.getSeconds();  //getSeconds is a pototype method built into JavaScript
-        const secondsDegrees = ((seconds / 60) * 360) + 90; //convert the number of seconds elapsed into an angular measure
+        const secondsDegrees = ((seconds / 60) * 360); //convert the number of seconds elapsed into an angular measure
                                                    // + 90 here offsets the initial setup for the visual black bar element of the second hand
-        secondHand.style.transform = `rotate(${secondsDegrees}deg)`; //change the visual positioning of the second hand on-screen
-        //console.log(seconds);
+        if (seconds == 59) {
+          secondHand.style.transform = `rotate(360deg)`;
+          secondHand.style.transition = `all 0.5s`;
+        } else if (seconds == 0) {
+          secondHand.style.transform = `rotate(0deg)`;
+          secondHand.style.transition = `all 0s`;
+        } else {
+          secondHand.style.transform = `rotate(${secondsDegrees}deg)`; //change the visual positioning of the second hand on-screen
+          secondHand.style.transition = `all 0.5s`;
+        }
 
         const minutes = now.getMinutes();
-        const minutesDegrees = ((minutes / 60) * 360) - 90;  //not entirely sure where the offset is coming from such that this needs to be accounted for
+        const minutesDegrees = ((minutes / 60) * 360);
+        secondHand.style.transform = `rotate(${secondsDegrees}deg)`; //change the visual positioning of the second hand on-screen
         minuteHand.style.transform = `rotate(${minutesDegrees}deg)`; //change the visual positioning of the minute hand on-screen
-        // console.log(minutes);
 
         const hours = now.getHours();
-        const hoursDegrees = ((hours / 12) * 360) - 90; //not entirely sure where the offset is coming from such that this needs to be accounted for
+        const hoursDegrees = ((hours / 12) * 180); // Multiply by 180 for 'hours' because the Date prototype function uses 24hr format
+        secondHand.style.transform = `rotate(${secondsDegrees}deg)`; //change the visual positioning of the second hand on-screen
+        minuteHand.style.transform = `rotate(${minutesDegrees}deg)`; //change the visual positioning of the minute hand on-screen
         hourHand.style.transform = `rotate(${hoursDegrees}deg)`; //change the visual positioning of the minute hand on-screen
-        // console.log(hours);
+        // console.log(`${hours}`);
       }
 
       setInterval(setDate, 1000);
